@@ -2,11 +2,11 @@ package cron
 
 import (
 	"fmt"
+	"github.com/larryfinn/rrule_runner"
+	"github.com/robfig/cron/v3"
 	"reflect"
 	"sync"
 	"time"
-
-	"github.com/robfig/cron/v3"
 )
 
 // cronFacade allows the client to operate using key rather than cron.EntryID,
@@ -21,7 +21,7 @@ type ScheduledTimeFunc func() time.Time
 
 func newCronFacade() *cronFacade {
 	return &cronFacade{
-		cron:     cron.New(),
+		cron:     cron.New(cron.WithParser(rrule_runner.NewCronOrRRuleParser())),
 		entryIDs: make(map[string]cron.EntryID),
 	}
 }
