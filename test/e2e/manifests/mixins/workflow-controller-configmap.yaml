@@ -8,13 +8,14 @@ data:
     burst: 1
   workflowDefaults: |
     spec:
+      imagePullSecrets:
+        - name: bleh-key
       activeDeadlineSeconds: 300
       ttlStrategy:
         secondsAfterCompletion: 600
       podSpecPatch: |
         terminationGracePeriodSeconds: 3
   executor: |
-    imagePullPolicy: Never
     resources:
       requests:
         cpu: 0.1

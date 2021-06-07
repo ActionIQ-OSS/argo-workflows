@@ -3,15 +3,15 @@ package validate
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/larryfinn/rrule_runner"
 	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	apivalidation "k8s.io/apimachinery/pkg/util/validation"
 	"sigs.k8s.io/yaml"
 
@@ -102,6 +102,8 @@ func (args *FakeArguments) GetArtifactByName(name string) *wfv1.Artifact {
 }
 
 var _ wfv1.ArgumentsProvider = &FakeArguments{}
+
+var cronParser = rrule_runner.NewCronOrRRuleParser()
 
 // ValidateWorkflow accepts a workflow and performs validation against it.
 func ValidateWorkflow(wftmplGetter templateresolution.WorkflowTemplateNamespacedGetter, cwftmplGetter templateresolution.ClusterWorkflowTemplateGetter, wf *wfv1.Workflow, opts ValidateOpts) (*wfv1.Conditions, error) {
@@ -279,7 +281,7 @@ func ValidateCronWorkflow(wftmplGetter templateresolution.WorkflowTemplateNamesp
 		return fmt.Errorf("cron workflow name %q must not be more than 52 characters long (currently %d)", cronWf.Name, len(cronWf.Name))
 	}
 
-	if _, err := cron.ParseStandard(cronWf.Spec.Schedule); err != nil {
+	if _, err := cronParser.Parse(cronWf.Spec.Schedule); err != nil {
 		return errors.Errorf(errors.CodeBadRequest, "cron schedule is malformed: %s", err)
 	}
 
