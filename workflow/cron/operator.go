@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/larryfinn/rrule_runner"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/robfig/cron/v3"
@@ -39,6 +41,8 @@ type cronWfOperationCtx struct {
 	// scheduledTimeFunc returns the last scheduled time when it is called
 	scheduledTimeFunc ScheduledTimeFunc
 }
+
+var cronParser = rrule_runner.NewCronOrRRuleParser()
 
 func newCronWfOperationCtx(cronWorkflow *v1alpha1.CronWorkflow, wfClientset versioned.Interface, metrics *metrics.Metrics) *cronWfOperationCtx {
 	return &cronWfOperationCtx{
@@ -225,15 +229,20 @@ func (woc *cronWfOperationCtx) shouldOutstandingWorkflowsBeRun() (time.Time, err
 			}
 			now = time.Now().In(loc)
 
-			cronScheduleString := "CRON_TZ=" + woc.cronWf.Spec.Timezone + " " + woc.cronWf.Spec.Schedule
-			cronSchedule, err = cron.ParseStandard(cronScheduleString)
+			var cronScheduleString string
+			if strings.HasPrefix(woc.cronWf.Spec.Schedule, "DTSTART") || strings.HasPrefix(woc.cronWf.Spec.Schedule, "RRULE") {
+				cronScheduleString = woc.cronWf.Spec.Schedule
+			} else {
+				cronScheduleString = "CRON_TZ=" + woc.cronWf.Spec.Timezone + " " + woc.cronWf.Spec.Schedule
+			}
+			cronSchedule, err = cronParser.Parse(cronScheduleString)
 			if err != nil {
 				return time.Time{}, fmt.Errorf("unable to form timezone schedule '%s': %s", cronScheduleString, err)
 			}
 		} else {
 			var err error
 			now = time.Now()
-			cronSchedule, err = cron.ParseStandard(woc.cronWf.Spec.Schedule)
+			cronSchedule, err = cronParser.Parse(woc.cronWf.Spec.Schedule)
 			if err != nil {
 				return time.Time{}, err
 			}

@@ -54,6 +54,7 @@ func (f *cronFacade) AddJob(key, schedule string, cwoc *cronWfOperationCtx) (Sch
 	}
 	f.entryIDs[key] = entryID
 
+
 	// Return a function to return the last scheduled time
 	return func() time.Time {
 		return f.cron.Entry(entryID).Prev

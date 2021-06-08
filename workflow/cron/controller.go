@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"k8s.io/apimachinery/pkg/selection"
@@ -186,7 +187,7 @@ func (cc *Controller) processNextCronItem(ctx context.Context) bool {
 	cc.cron.Delete(key.(string))
 
 	cronSchedule := cronWf.Spec.Schedule
-	if cronWf.Spec.Timezone != "" {
+	if cronWf.Spec.Timezone != "" && !strings.HasPrefix(cronWf.Spec.Schedule, "DTSTART") && !strings.HasPrefix(cronWf.Spec.Schedule, "RRULE") {
 		cronSchedule = "CRON_TZ=" + cronWf.Spec.Timezone + " " + cronSchedule
 	}
 

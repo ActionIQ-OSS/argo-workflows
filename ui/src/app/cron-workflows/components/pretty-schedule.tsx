@@ -1,6 +1,7 @@
 import React = require('react');
 
 const x = require('cronstrue');
+import { RRule } from 'rrule'
 
 /*
     https://github.com/bradymholt/cRonstrue
@@ -13,7 +14,11 @@ const x = require('cronstrue');
 
 export const PrettySchedule = ({schedule}: {schedule: string}) => {
     try {
-        const pretty = x.toString(schedule);
+        if (schedule.startsWith("DTSTART") || schedule.startsWith("RRULE")) {
+            const pretty = RRule.fromString(schedule).toText();
+        } else {
+            const pretty = x.toString(schedule);
+        }
         return <span title={pretty}>{pretty}</span>;
     } catch (e) {
         return <>{e.toString()}</>;

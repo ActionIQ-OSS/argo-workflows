@@ -38,7 +38,7 @@ require (
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/klauspost/compress v1.11.9 // indirect
 	github.com/klauspost/pgzip v1.2.5
-	github.com/larryfinn/rrule_runner v0.0.3
+	github.com/larryfinn/rrule_runner v0.0.4
 	github.com/minio/minio-go/v7 v7.0.2
 	github.com/mitchellh/go-ps v0.0.0-20190716172923-621e5597135b
 	github.com/pkg/errors v0.9.1
