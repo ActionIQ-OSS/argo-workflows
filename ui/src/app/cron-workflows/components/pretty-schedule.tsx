@@ -14,10 +14,11 @@ import { RRule } from 'rrule'
 
 export const PrettySchedule = ({schedule}: {schedule: string}) => {
     try {
+        let pretty = ""
         if (schedule.startsWith("DTSTART") || schedule.startsWith("RRULE")) {
-            const pretty = RRule.fromString(schedule).toText();
+            pretty = RRule.fromString(schedule).toText();
         } else {
-            const pretty = x.toString(schedule);
+            pretty = x.toString(schedule);
         }
         return <span title={pretty}>{pretty}</span>;
     } catch (e) {
